@@ -19,21 +19,21 @@
  */
 
 /**
- * @fileoverview Helper functions for generating RoboRio for blocks.
+ * @fileoverview Helper functions for generating JavaScript for blocks.
  * @author fraser@google.com (Neil Fraser)
  */
 'use strict';
 
-goog.provide('Blockly.RoboRio');
+goog.provide('Blockly.JavaScript');
 
 goog.require('Blockly.Generator');
 
 
 /**
- * RoboRio code generator.
+ * JavaScript code generator.
  * @type {!Blockly.Generator}
  */
-Blockly.RoboRio = new Blockly.Generator('RoboRio');
+Blockly.JavaScript = new Blockly.Generator('JavaScript');
 
 /**
  * List of illegal variable names.
@@ -42,13 +42,13 @@ Blockly.RoboRio = new Blockly.Generator('RoboRio');
  * accidentally clobbering a built-in object or function.
  * @private
  */
-Blockly.RoboRio.addReservedWords(
+Blockly.JavaScript.addReservedWords(
     'Blockly,' +  // In case JS is evaled in the current window.
-    // https://developer.mozilla.org/en/RoboRio/Reference/Reserved_Words
+    // https://developer.mozilla.org/en/JavaScript/Reference/Reserved_Words
     'break,case,catch,continue,debugger,default,delete,do,else,finally,for,function,if,in,instanceof,new,return,switch,this,throw,try,typeof,var,void,while,with,' +
     'class,enum,export,extends,import,super,implements,interface,let,package,private,protected,public,static,yield,' +
     'const,null,true,false,' +
-    // https://developer.mozilla.org/en/RoboRio/Reference/Global_Objects
+    // https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects
     'Array,ArrayBuffer,Boolean,Date,decodeURI,decodeURIComponent,encodeURI,encodeURIComponent,Error,eval,EvalError,Float32Array,Float64Array,Function,Infinity,Int16Array,Int32Array,Int8Array,isFinite,isNaN,Iterator,JSON,Math,NaN,Number,Object,parseFloat,parseInt,RangeError,ReferenceError,RegExp,StopIteration,String,SyntaxError,TypeError,Uint16Array,Uint32Array,Uint8Array,Uint8ClampedArray,undefined,uneval,URIError,' +
     // https://developer.mozilla.org/en/DOM/window
     'applicationCache,closed,Components,content,_content,controllers,crypto,defaultStatus,dialogArguments,directories,document,frameElement,frames,fullScreen,globalStorage,history,innerHeight,innerWidth,length,location,locationbar,localStorage,menubar,messageManager,mozAnimationStartTime,mozInnerScreenX,mozInnerScreenY,mozPaintCount,name,navigator,opener,outerHeight,outerWidth,pageXOffset,pageYOffset,parent,performance,personalbar,pkcs11,returnValue,screen,screenX,screenY,scrollbars,scrollMaxX,scrollMaxY,scrollX,scrollY,self,sessionStorage,sidebar,status,statusbar,toolbar,top,URL,window,' +
@@ -68,66 +68,67 @@ Blockly.RoboRio.addReservedWords(
 
 /**
  * Order of operation ENUMs.
- * http://en.cppreference.com/w/cpp/language/operator_precedence
+ * https://developer.mozilla.org/en/JavaScript/Reference/Operators/Operator_Precedence
  */
-Blockly.RoboRio.ORDER_ATOMIC = 0;           // 0 "" ...
-Blockly.RoboRio.ORDER_SCOPE_RESOLUTION = 1; // 0 "" ...
-Blockly.RoboRio.ORDER_MEMBER = 2;           // . []
-Blockly.RoboRio.ORDER_FUNCTION_CALL = 2;    // ()
-Blockly.RoboRio.ORDER_NEW = 3;              // new
-Blockly.RoboRio.ORDER_INCREMENT = 3;        // ++
-Blockly.RoboRio.ORDER_DECREMENT = 3;        // --
-Blockly.RoboRio.ORDER_LOGICAL_NOT = 3;      // !
-Blockly.RoboRio.ORDER_BITWISE_NOT = 3;      // ~
-Blockly.RoboRio.ORDER_UNARY_PLUS = 3;       // +
-Blockly.RoboRio.ORDER_UNARY_NEGATION = 3;   // -
-Blockly.RoboRio.ORDER_VOID = 3;             // void
-Blockly.RoboRio.ORDER_DELETE = 3;           // delete
-Blockly.RoboRio.ORDER_POINTER = 4           // .* ->*
-Blockly.RoboRio.ORDER_MULTIPLICATION = 5;   // *
-Blockly.RoboRio.ORDER_DIVISION = 5;         // /
-Blockly.RoboRio.ORDER_MODULUS = 5;          // %
-Blockly.RoboRio.ORDER_ADDITION = 6;         // +
-Blockly.RoboRio.ORDER_SUBTRACTION = 6;      // -
-Blockly.RoboRio.ORDER_BITWISE_SHIFT = 7;    // << >> >>>
-Blockly.RoboRio.ORDER_RELATIONAL = 8;       // < <= > >=
-Blockly.RoboRio.ORDER_EQUALITY = 9;         // == != === !==
-Blockly.RoboRio.ORDER_BITWISE_AND = 10;     // &
-Blockly.RoboRio.ORDER_BITWISE_XOR = 11;     // ^
-Blockly.RoboRio.ORDER_BITWISE_OR = 12;      // |
-Blockly.RoboRio.ORDER_LOGICAL_AND = 13;     // &&
-Blockly.RoboRio.ORDER_LOGICAL_OR = 14;      // ||
-Blockly.RoboRio.ORDER_CONDITIONAL = 15;     // ?:
-Blockly.RoboRio.ORDER_ASSIGNMENT = 15;      // = += -= *= /= %= <<= >>= ...
-Blockly.RoboRio.ORDER_COMMA = 16;           // ,
-Blockly.RoboRio.ORDER_NONE = 99;            // (...)
+Blockly.JavaScript.ORDER_ATOMIC = 0;         // 0 "" ...
+Blockly.JavaScript.ORDER_MEMBER = 1;         // . []
+Blockly.JavaScript.ORDER_NEW = 1;            // new
+Blockly.JavaScript.ORDER_FUNCTION_CALL = 2;  // ()
+Blockly.JavaScript.ORDER_INCREMENT = 3;      // ++
+Blockly.JavaScript.ORDER_DECREMENT = 3;      // --
+Blockly.JavaScript.ORDER_LOGICAL_NOT = 4;    // !
+Blockly.JavaScript.ORDER_BITWISE_NOT = 4;    // ~
+Blockly.JavaScript.ORDER_UNARY_PLUS = 4;     // +
+Blockly.JavaScript.ORDER_UNARY_NEGATION = 4; // -
+Blockly.JavaScript.ORDER_TYPEOF = 4;         // typeof
+Blockly.JavaScript.ORDER_VOID = 4;           // void
+Blockly.JavaScript.ORDER_DELETE = 4;         // delete
+Blockly.JavaScript.ORDER_MULTIPLICATION = 5; // *
+Blockly.JavaScript.ORDER_DIVISION = 5;       // /
+Blockly.JavaScript.ORDER_MODULUS = 5;        // %
+Blockly.JavaScript.ORDER_ADDITION = 6;       // +
+Blockly.JavaScript.ORDER_SUBTRACTION = 6;    // -
+Blockly.JavaScript.ORDER_BITWISE_SHIFT = 7;  // << >> >>>
+Blockly.JavaScript.ORDER_RELATIONAL = 8;     // < <= > >=
+Blockly.JavaScript.ORDER_IN = 8;             // in
+Blockly.JavaScript.ORDER_INSTANCEOF = 8;     // instanceof
+Blockly.JavaScript.ORDER_EQUALITY = 9;       // == != === !==
+Blockly.JavaScript.ORDER_BITWISE_AND = 10;   // &
+Blockly.JavaScript.ORDER_BITWISE_XOR = 11;   // ^
+Blockly.JavaScript.ORDER_BITWISE_OR = 12;    // |
+Blockly.JavaScript.ORDER_LOGICAL_AND = 13;   // &&
+Blockly.JavaScript.ORDER_LOGICAL_OR = 14;    // ||
+Blockly.JavaScript.ORDER_CONDITIONAL = 15;   // ?:
+Blockly.JavaScript.ORDER_ASSIGNMENT = 16;    // = += -= *= /= %= <<= >>= ...
+Blockly.JavaScript.ORDER_COMMA = 17;         // ,
+Blockly.JavaScript.ORDER_NONE = 99;          // (...)
 
 /**
  * Initialise the database of variable names.
  * @param {!Blockly.Workspace} workspace Workspace to generate code from.
  */
-Blockly.RoboRio.init = function(workspace) {
+Blockly.JavaScript.init = function(workspace) {
   // Create a dictionary of definitions to be printed before the code.
-  Blockly.RoboRio.definitions_ = Object.create(null);
+  Blockly.JavaScript.definitions_ = Object.create(null);
   // Create a dictionary mapping desired function names in definitions_
   // to actual function names (to avoid collisions with user functions).
-  Blockly.RoboRio.functionNames_ = Object.create(null);
+  Blockly.JavaScript.functionNames_ = Object.create(null);
 
-  if (!Blockly.RoboRio.variableDB_) {
-    Blockly.RoboRio.variableDB_ =
-        new Blockly.Names(Blockly.RoboRio.RESERVED_WORDS_);
+  if (!Blockly.JavaScript.variableDB_) {
+    Blockly.JavaScript.variableDB_ =
+        new Blockly.Names(Blockly.JavaScript.RESERVED_WORDS_);
   } else {
-    Blockly.RoboRio.variableDB_.reset();
+    Blockly.JavaScript.variableDB_.reset();
   }
-  
+
   var defvars = [];
   var variables = Blockly.Variables.allVariables(workspace);
   for (var i = 0; i < variables.length; i++) {
-    defvars[i] = 'string ' +
-        Blockly.RoboRio.variableDB_.getName(variables[i],
+    defvars[i] = 'var ' +
+        Blockly.JavaScript.variableDB_.getName(variables[i],
         Blockly.Variables.NAME_TYPE) + ';';
   }
-  Blockly.RoboRio.definitions_['variables'] = defvars.join('\n');
+  Blockly.JavaScript.definitions_['variables'] = defvars.join('\n');
 };
 
 /**
@@ -135,20 +136,17 @@ Blockly.RoboRio.init = function(workspace) {
  * @param {string} code Generated code.
  * @return {string} Completed code.
  */
-Blockly.RoboRio.finish = function(code) {
+Blockly.JavaScript.finish = function(code) {
   // Convert the definitions dictionary into a list.
-  var preamble = '#include "code.hh"\n\n';
-  var defFunctions = '\n\nRobot::Robot() {}\n\nRobot::~Robot() {}';
-  var after = '\nSTART_ROBOT_CLASS(Robot);';
   var definitions = [];
-  for (var name in Blockly.RoboRio.definitions_) {
-    definitions.push(Blockly.RoboRio.definitions_[name]);
+  for (var name in Blockly.JavaScript.definitions_) {
+    definitions.push(Blockly.JavaScript.definitions_[name]);
   }
   // Clean up temporary data.
-  delete Blockly.RoboRio.definitions_;
-  delete Blockly.RoboRio.functionNames_;
-  Blockly.RoboRio.variableDB_.reset();
-  return preamble + definitions.join('\n') + defFunctions + '\n\n' + code + after;
+  delete Blockly.JavaScript.definitions_;
+  delete Blockly.JavaScript.functionNames_;
+  Blockly.JavaScript.variableDB_.reset();
+  return definitions.join('\n\n') + '\n\n\n' + code;
 };
 
 /**
@@ -157,18 +155,18 @@ Blockly.RoboRio.finish = function(code) {
  * @param {string} line Line of generated code.
  * @return {string} Legal line of code.
  */
-Blockly.RoboRio.scrubNakedValue = function(line) {
+Blockly.JavaScript.scrubNakedValue = function(line) {
   return line + ';\n';
 };
 
 /**
- * Encode a string as a properly escaped C++ string, complete with
+ * Encode a string as a properly escaped JavaScript string, complete with
  * quotes.
  * @param {string} string Text to encode.
- * @return {string} RoboRio string.
+ * @return {string} JavaScript string.
  * @private
  */
-Blockly.RoboRio.quote_ = function(string) {
+Blockly.JavaScript.quote_ = function(string) {
   // TODO: This is a quick hack.  Replace with goog.string.quote
   string = string.replace(/\\/g, '\\\\')
                  .replace(/\n/g, '\\\n')
@@ -177,22 +175,22 @@ Blockly.RoboRio.quote_ = function(string) {
 };
 
 /**
- * Common tasks for generating C++ from blocks.
+ * Common tasks for generating JavaScript from blocks.
  * Handles comments for the specified block and any connected value blocks.
  * Calls any statements following this block.
  * @param {!Blockly.Block} block The current block.
- * @param {string} code The RoboRio code created for this block.
- * @return {string} RoboRio code with comments and subsequent blocks added.
+ * @param {string} code The JavaScript code created for this block.
+ * @return {string} JavaScript code with comments and subsequent blocks added.
  * @private
  */
-Blockly.RoboRio.scrub_ = function(block, code) {
+Blockly.JavaScript.scrub_ = function(block, code) {
   var commentCode = '';
   // Only collect comments for blocks that aren't inline.
   if (!block.outputConnection || !block.outputConnection.targetConnection) {
     // Collect comment for this block.
     var comment = block.getCommentText();
     if (comment) {
-      commentCode += Blockly.RoboRio.prefixLines(comment, '// ') + '\n';
+      commentCode += Blockly.JavaScript.prefixLines(comment, '// ') + '\n';
     }
     // Collect comments for all value arguments.
     // Don't collect comments for nested statements.
@@ -200,15 +198,15 @@ Blockly.RoboRio.scrub_ = function(block, code) {
       if (block.inputList[x].type == Blockly.INPUT_VALUE) {
         var childBlock = block.inputList[x].connection.targetBlock();
         if (childBlock) {
-          var comment = Blockly.RoboRio.allNestedComments(childBlock);
+          var comment = Blockly.JavaScript.allNestedComments(childBlock);
           if (comment) {
-            commentCode += Blockly.RoboRio.prefixLines(comment, '// ');
+            commentCode += Blockly.JavaScript.prefixLines(comment, '// ');
           }
         }
       }
     }
   }
   var nextBlock = block.nextConnection && block.nextConnection.targetBlock();
-  var nextCode = Blockly.RoboRio.blockToCode(nextBlock);
+  var nextCode = Blockly.JavaScript.blockToCode(nextBlock);
   return commentCode + code + nextCode;
 };

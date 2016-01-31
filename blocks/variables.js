@@ -124,6 +124,17 @@ Blockly.Blocks['variables_set'] = {
     return [this.getFieldValue('VAR')];
   },
   /**
+   * Runs everytime the workspace changes.
+   * Show a warning if variable is not defined
+   */
+  onchange: function() {
+	if (goog.array.contains(Blockly.Variables.allVariables(workspace,true), this.getFieldValue('VAR'))) {
+      this.setWarningText(null);
+	} else {
+      this.setWarningText("The definition for this variable is missing!");
+	}
+  },
+  /**
    * Notification that a variable is renaming.
    * If the name matches one of this block's variables, rename it.
    * @param {string} oldName Previous name of variable.
@@ -138,3 +149,40 @@ Blockly.Blocks['variables_set'] = {
   contextMenuType_: 'variables_get',
   customContextMenu: Blockly.Blocks['variables_get'].customContextMenu
 };
+
+Blockly.Blocks['variables_def'] = {
+  init: function() {
+	var dropdown = new Blockly.FieldDropdown([['integer', 'INT'], ['string', 'STR']]);
+    this.appendValueInput("INITIAL")
+        .setCheck(null)
+        .appendField("Define a ")
+        .appendField(dropdown, 'TYPE')
+        .appendField(" variable named ")
+        .appendField(new Blockly.FieldVariable("item"), "VAR")
+        .appendField(" with initial value");
+    this.setInputsInline(false);
+    this.setColour(330);
+    this.setTooltip('Define a variable');
+	this.setPriority(0);
+  },
+  /**
+   * Return all variables referenced by this block.
+   * @return {!Array.<string>} List of variable names.
+   * @this Blockly.Block
+   */
+  getVars: function() {
+    return [this.getFieldValue('VAR')];
+  },
+  /**
+   * Notification that a variable is renaming.
+   * If the name matches one of this block's variables, rename it.
+   * @param {string} oldName Previous name of variable.
+   * @param {string} newName Renamed variable.
+   * @this Blockly.Block
+   */
+  renameVar: function(oldName, newName) {
+    if (Blockly.Names.equals(oldName, this.getFieldValue('VAR'))) {
+      this.setFieldValue(newName, 'VAR');
+    }
+  }
+}

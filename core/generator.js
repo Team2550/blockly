@@ -77,6 +77,7 @@ Blockly.Generator.prototype.workspaceToCode = function(workspace) {
   var code = [];
   this.init(workspace);
   var blocks = workspace.getTopBlocks(true);
+
   for (var x = 0, block; block = blocks[x]; x++) {
     var line = this.blockToCode(block);
     if (goog.isArray(line)) {
@@ -85,12 +86,14 @@ Blockly.Generator.prototype.workspaceToCode = function(workspace) {
       line = line[0];
     }
     if (line) {
-      if (block.outputConnection && this.scrubNakedValue) {
+      /*if ( && this.scrubNakedValue) {
         // This block is a naked value.  Ask the language's code generator if
         // it wants to append a semicolon, or something.
         line = this.scrubNakedValue(line);
-      }
-      code.push(line);
+      }*/
+	  if (!(block.previousConnection || block.outputConnection)) {
+		code.push(line);
+	  }
     }
   }
   code = code.join('\n');  // Blank line between each section.
@@ -151,7 +154,7 @@ Blockly.Generator.prototype.blockToCode = function(block) {
     // Skip past this block if it is disabled.
     return this.blockToCode(block.getNextBlock());
   }
-
+  
   var func = this[block.type];
   goog.asserts.assertFunction(func,
       'Language "%s" does not know how to generate code for block type "%s".',

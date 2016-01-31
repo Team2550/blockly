@@ -114,6 +114,12 @@ Blockly.Workspace.prototype.getTopBlocks = function(ordered) {
       offset *= -1;
     }
     blocks.sort(function(a, b) {
+	  if (a.priority < b.priority) {
+		  return -1;
+	  } else if (b.priority < a.priority) {
+		  return 1;
+	  }
+	  
       var aXY = a.getRelativeToSurfaceXY();
       var bXY = b.getRelativeToSurfaceXY();
       return (aXY.y + offset * aXY.x) - (bXY.y + offset * bXY.x);

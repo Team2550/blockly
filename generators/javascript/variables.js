@@ -24,34 +24,23 @@
  */
 'use strict';
 
-goog.provide('Blockly.RoboRio.variables');
+goog.provide('Blockly.JavaScript.variables');
 
-goog.require('Blockly.RoboRio');
+goog.require('Blockly.JavaScript');
 
 
-Blockly.RoboRio['variables_get'] = function(block) {
+Blockly.JavaScript['variables_get'] = function(block) {
   // Variable getter.
-  var code = Blockly.RoboRio.variableDB_.getName(block.getFieldValue('VAR'),
+  var code = Blockly.JavaScript.variableDB_.getName(block.getFieldValue('VAR'),
       Blockly.Variables.NAME_TYPE);
-  return [code, Blockly.RoboRio.ORDER_ATOMIC];
+  return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
-Blockly.RoboRio['variables_set'] = function(block) {
+Blockly.JavaScript['variables_set'] = function(block) {
   // Variable setter.
-  var argument0 = Blockly.RoboRio.valueToCode(block, 'VALUE',
-      Blockly.RoboRio.ORDER_ASSIGNMENT) || '0';
-  var varName = Blockly.RoboRio.variableDB_.getName(
+  var argument0 = Blockly.JavaScript.valueToCode(block, 'VALUE',
+      Blockly.JavaScript.ORDER_ASSIGNMENT) || '0';
+  var varName = Blockly.JavaScript.variableDB_.getName(
       block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
   return varName + ' = ' + argument0 + ';\n';
-};
-
-Blockly.RoboRio['variables_def'] = function(block) {
-  // Variable definition.
-  var types = {INT: "int", STR: "string"};
-  var initial = Blockly.RoboRio.valueToCode(block, 'INITIAL',
-      Blockly.RoboRio.ORDER_ASSIGNMENT) || '0';
-  var type = types[block.getFieldValue('TYPE')];
-  var varName = Blockly.RoboRio.variableDB_.getName(
-      block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
-  return type + ' ' + varName + ' = ' + initial + ';\n';
 };

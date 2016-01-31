@@ -42,29 +42,36 @@ Blockly.Variables.NAME_TYPE = 'VARIABLE';
  * @param {!Blockly.Block|!Blockly.Workspace} root Root block or workspace.
  * @return {!Array.<string>} Array of variable names.
  */
-Blockly.Variables.allVariables = function(root) {
+Blockly.Variables.allVariables = function(root, defined) {
   var blocks;
   if (root.getDescendants) {
     // Root is Block.
     blocks = root.getDescendants();
   } else if (root.getAllBlocks) {
     // Root is Workspace.
-    blocks = root.getAllBlocks();
+    blocks = root.getTopBlocks(false);
   } else {
     throw 'Not Block or Workspace: ' + root;
   }
   var variableHash = Object.create(null);
   // Iterate through every block and add each variable to the hash.
   for (var x = 0; x < blocks.length; x++) {
-    if (blocks[x].getVars) {
-      var blockVariables = blocks[x].getVars();
-      for (var y = 0; y < blockVariables.length; y++) {
-        var varName = blockVariables[y];
-        // Variable name may be null if the block is only half-built.
-        if (varName) {
-          variableHash[varName.toLowerCase()] = varName;
-        }
-      }
+    if (!(blocks[x].outputConnection || blocks[x].previousConnection)) {
+	  var descendants = blocks[x].getDescendants();
+	  for (var y = 0; y < descendants.length; y++) {
+		  if (descendants[y].type && (descendants[y].type == "variables_def" || !defined)) {
+			  if (descendants[y].getVars) {
+				  var blockVariables = descendants[y].getVars();
+				  for (var z = 0; z < blockVariables.length; z++) {
+					var varName = blockVariables[z];
+					// Variable name may be null if the block is only half-built.
+					if (varName) {
+					  variableHash[varName.toLowerCase()] = varName;
+					}
+				  }
+			  }
+		  }
+	  }
     }
   }
   // Flatten the hash into a list.
@@ -72,6 +79,7 @@ Blockly.Variables.allVariables = function(root) {
   for (var name in variableHash) {
     variableList.push(variableHash[name]);
   }
+  
   return variableList;
 };
 
@@ -97,15 +105,29 @@ Blockly.Variables.renameVariable = function(oldName, newName, workspace) {
  * @return {!Array.<!Element>} Array of XML block elements.
  */
 Blockly.Variables.flyoutCategory = function(workspace) {
-  var variableList = Blockly.Variables.allVariables(workspace);
+  var variableList = Blockly.Variables.allVariables(workspace, false);
   variableList.sort(goog.string.caseInsensitiveCompare);
   // In addition to the user's variables, we also want to display the default
   // variable name at the top.  We also don't want this duplicated if the
   // user has created a variable of the same name.
-  goog.array.remove(variableList, Blockly.Msg.VARIABLES_DEFAULT_NAME);
-  variableList.unshift(Blockly.Msg.VARIABLES_DEFAULT_NAME);
-
+  /*goog.array.remove(variableList, Blockly.Msg.VARIABLES_DEFAULT_NAME);
+  variableList.unshift(Blockly.Msg.VARIABLES_DEFAULT_NAME);*/
+  
   var xmlList = [];
+  if (Blockly.Blocks['variables_def']) {
+    // <block type="variables_set" gap="8">
+    //   <field name="VAR">item</field>
+    // </block>
+	var block = goog.dom.createDom('block');
+    block.setAttribute('type', 'variables_def');
+    if (Blockly.Blocks['variables_set']) {
+	  block.setAttribute('gap', 8);
+    }
+    var field = goog.dom.createDom('field', null, variableList[i]);
+    field.setAttribute('name', 'VAR');
+    block.appendChild(field);
+    xmlList.push(block);
+  }
   for (var i = 0; i < variableList.length; i++) {
     if (Blockly.Blocks['variables_set']) {
       // <block type="variables_set" gap="8">
@@ -148,7 +170,7 @@ Blockly.Variables.flyoutCategory = function(workspace) {
 * @return {string} New variable name.
 */
 Blockly.Variables.generateUniqueName = function(workspace) {
-  var variableList = Blockly.Variables.allVariables(workspace);
+  var variableList = Blockly.Variables.allVariables(workspace, false);
   var newName = '';
   if (variableList.length) {
     var nameSuffix = 1;

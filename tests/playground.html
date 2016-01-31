@@ -4,51 +4,25 @@
 <meta charset="utf-8">
 <title>Blockly Playground</title>
 <script src="../blockly_uncompressed.js"></script>
-<script src="../generators/javascript.js"></script>
-<script src="../generators/javascript/logic.js"></script>
-<script src="../generators/javascript/loops.js"></script>
-<script src="../generators/javascript/math.js"></script>
-<script src="../generators/javascript/text.js"></script>
-<script src="../generators/javascript/lists.js"></script>
-<script src="../generators/javascript/colour.js"></script>
-<script src="../generators/javascript/variables.js"></script>
-<script src="../generators/javascript/procedures.js"></script>
-<script src="../generators/php.js"></script>
-<script src="../generators/php/logic.js"></script>
-<script src="../generators/php/loops.js"></script>
-<script src="../generators/php/math.js"></script>
-<script src="../generators/php/text.js"></script>
-<script src="../generators/php/lists.js"></script>
-<script src="../generators/php/colour.js"></script>
-<script src="../generators/php/variables.js"></script>
-<script src="../generators/php/procedures.js"></script>
-<script src="../generators/python.js"></script>
-<script src="../generators/python/logic.js"></script>
-<script src="../generators/python/loops.js"></script>
-<script src="../generators/python/math.js"></script>
-<script src="../generators/python/text.js"></script>
-<script src="../generators/python/lists.js"></script>
-<script src="../generators/python/colour.js"></script>
-<script src="../generators/python/variables.js"></script>
-<script src="../generators/python/procedures.js"></script>
-<script src="../generators/dart.js"></script>
-<script src="../generators/dart/logic.js"></script>
-<script src="../generators/dart/loops.js"></script>
-<script src="../generators/dart/math.js"></script>
-<script src="../generators/dart/text.js"></script>
-<script src="../generators/dart/lists.js"></script>
-<script src="../generators/dart/colour.js"></script>
-<script src="../generators/dart/variables.js"></script>
-<script src="../generators/dart/procedures.js"></script>
+<script src="../generators/roborio.js"></script>
+<script src="../generators/roborio/logic.js"></script>
+<script src="../generators/roborio/loops.js"></script>
+<script src="../generators/roborio/math.js"></script>
+<script src="../generators/roborio/text.js"></script>
+<script src="../generators/roborio/lists.js"></script>
+<!--<script src="../generators/roborio/colour.js"></script>-->
+<script src="../generators/roborio/variables.js"></script>
+<script src="../generators/roborio/procedures.js"></script>
+<script src="../generators/roborio/robot.js"></script>
 <script src="../msg/messages.js"></script>
 <script src="../blocks/logic.js"></script>
 <script src="../blocks/loops.js"></script>
 <script src="../blocks/math.js"></script>
 <script src="../blocks/text.js"></script>
 <script src="../blocks/lists.js"></script>
-<script src="../blocks/colour.js"></script>
 <script src="../blocks/variables.js"></script>
 <script src="../blocks/procedures.js"></script>
+<script src="../blocks/robot.js"></script>
 <script>
 'use strict';
 // Depending on the URL argument, render as LTR or RTL.
@@ -163,6 +137,15 @@ var spaghettiXml = [
   '    <next></next>',
   '  </block>'].join('\n');
 
+function starterCode(workspace) {
+	var xml = '<xml><block type="robot_robotinit" x="13" y="13"></block><block type="robot_autoinit" x="13" y="113"></block><block type="robot_autoper" x="313" y="113"></block><block type="robot_telinit" x="13" y="213"></block><block type="robot_telper" x="313" y="213"></block><block type="robot_disinit" x="13" y="313"></block><block type="robot_disper" x="313" y="313"></block></xml>';
+
+	if (!workspace) {
+		workspace = Blockly.getMainWorkspace();
+	}
+
+	Blockly.Xml.domToWorkspace(workspace, Blockly.Xml.textToDom(xml));	
+}
 </script>
 
 <style>
@@ -200,7 +183,7 @@ h1 {
 }
 </style>
 </head>
-<body onload="start()">
+<body onload="start();starterCode();">
 
   <div id="collaborators"></div>
 
@@ -418,92 +401,84 @@ h1 {
       </block>
     </category>
     <category name="Lists" colour="260">
-      <block type="lists_create_with">
-        <mutation items="0"></mutation>
+      <block type="text"></block>
+      <block type="text_join"></block>
+      <block type="text_append">
+        <value name="TEXT">
+          <shadow type="text"></shadow>
+        </value>
       </block>
-      <block type="lists_create_with"></block>
-      <block type="lists_repeat">
-        <value name="NUM">
-          <shadow type="math_number">
-            <field name="NUM">5</field>
+      <block type="text_length">
+        <value name="VALUE">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
           </shadow>
         </value>
       </block>
-      <block type="lists_length"></block>
-      <block type="lists_isEmpty"></block>
-      <block type="lists_indexOf">
+      <block type="text_isEmpty">
         <value name="VALUE">
-          <block type="variables_get">
-            <field name="VAR">list</field>
-          </block>
-        </value>
-      </block>
-      <block type="lists_getIndex">
-        <value name="VALUE">
-          <block type="variables_get">
-            <field name="VAR">list</field>
-          </block>
-        </value>
-      </block>
-      <block type="lists_setIndex">
-        <value name="LIST">
-          <block type="variables_get">
-            <field name="VAR">list</field>
-          </block>
-        </value>
-      </block>
-      <block type="lists_getSublist">
-        <value name="LIST">
-          <block type="variables_get">
-            <field name="VAR">list</field>
-          </block>
-        </value>
-      </block>
-      <block type="lists_split">
-        <value name="DELIM">
           <shadow type="text">
-            <field name="TEXT">,</field>
+            <field name="TEXT"></field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_indexOf">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR">text</field>
+          </block>
+        </value>
+        <value name="FIND">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_charAt">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR">text</field>
+          </block>
+        </value>
+      </block>
+      <block type="text_getSubstring">
+        <value name="STRING">
+          <block type="variables_get">
+            <field name="VAR">text</field>
+          </block>
+        </value>
+      </block>
+      <block type="text_changeCase">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_trim">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_print">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_prompt_ext">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
           </shadow>
         </value>
       </block>
     </category>
-    <category name="Colour" colour="20">
-      <block type="colour_picker"></block>
-      <block type="colour_random"></block>
-      <block type="colour_rgb">
-        <value name="RED">
-          <shadow type="math_number">
-            <field name="NUM">100</field>
-          </shadow>
-        </value>
-        <value name="GREEN">
-          <shadow type="math_number">
-            <field name="NUM">50</field>
-          </shadow>
-        </value>
-        <value name="BLUE">
-          <shadow type="math_number">
-            <field name="NUM">0</field>
-          </shadow>
-        </value>
-      </block>
-      <block type="colour_blend">
-        <value name="COLOUR1">
-          <shadow type="colour_picker">
-            <field name="COLOUR">#ff0000</field>
-          </shadow>
-        </value>
-        <value name="COLOUR2">
-          <shadow type="colour_picker">
-            <field name="COLOUR">#3333ff</field>
-          </shadow>
-        </value>
-        <value name="RATIO">
-          <shadow type="math_number">
-            <field name="NUM">0.5</field>
-          </shadow>
-        </value>
-      </block>
+    <category name="Robot Code" colour="0">
+      
     </category>
     <sep></sep>
     <category name="Variables" colour="330" custom="VARIABLE"></category>
@@ -528,13 +503,7 @@ h1 {
     &nbsp;
     <input type="button" value="Import from XML" onclick="fromXml()">
     <br>
-    <input type="button" value="To JavaScript" onclick="toCode('JavaScript')">
-    &nbsp;
-    <input type="button" value="To Python" onclick="toCode('Python')">
-    &nbsp;
-    <input type="button" value="To PHP" onclick="toCode('PHP')">
-    &nbsp;
-    <input type="button" value="To Dart" onclick="toCode('Dart')">
+    <input type="button" value="To RoboRIO C++" onclick="toCode('RoboRio')">
     <br>
     <textarea id="importExport" style="width: 26%; height: 12em"></textarea>
   </p>

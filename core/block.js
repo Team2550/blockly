@@ -74,6 +74,9 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
   this.tooltip = '';
   /** @type {boolean} */
   this.contextMenu = true;
+  
+  /** @type {integer} Specifies priority in build */
+  this.priority = 999;
 
   /** @type {Blockly.Block} */
   this.parentBlock_ = null;
@@ -816,6 +819,22 @@ Blockly.Block.prototype.isCollapsed = function() {
 Blockly.Block.prototype.setCollapsed = function(collapsed) {
   this.collapsed_ = collapsed;
 };
+
+/**
+ * Get the build priority
+ * @return {integer}
+ */
+Blockly.Block.prototype.getPriority = function() {
+	return this.priority;
+}
+
+/**
+ * Set the build priority
+ * @param {integer}
+ */
+Blockly.Block.prototype.setPriority = function(priority) {
+	this.priority = priority;
+}
 
 /**
  * Create a human-readable text representation of this block and any children.
