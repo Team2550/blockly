@@ -1,0 +1,8 @@
+To Do List:
+-	Change type requirements for setting and getting of variables
+-	Fix how code is generated for variables so they are declared first
+-	Add variable types for motors and sensors
+-	Add ways to separate code into multiple workspaces
+-	Create a public / private function and variable system for interaction between workspaces
+-	Write code for the generation of Eclipse projects
+-	Generate separate classes for separate workspaces
