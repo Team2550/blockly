@@ -58,6 +58,31 @@ Blockly.Blocks['variables_get'] = {
     return [this.getFieldValue('VAR')];
   },
   /**
+   * Modify this block to have the correct input and output types.
+   * @param {string} newMode Either 'SPLIT' or 'JOIN'.
+   * @private
+   * @this Blockly.Block
+   */
+  updateType_: function(type) {
+	var types = {INT: "Number", STR: "String"};
+    this.outputConnection.setCheck(types[type]);
+    /*this.getInput('INPUT').setCheck('Array');*/
+  },
+  /**
+   * Runs everytime the workspace changes.
+   * Show a warning if variable is not defined
+   */
+  onchange: function() {
+	var allVars = Blockly.Variables.allVariables(workspace,true,false);
+	if (goog.array.contains(allVars, this.getFieldValue('VAR'))) {
+      this.setWarningText(null);
+	  this.updateType_(Blockly.Variables.allVariables(workspace,true,true)[this.getFieldValue('VAR')]);
+	} else {
+      this.setWarningText("The definition for this variable is missing!");
+	}
+  },
+  
+  /**
    * Notification that a variable is renaming.
    * If the name matches one of this block's variables, rename it.
    * @param {string} oldName Previous name of variable.
@@ -124,12 +149,24 @@ Blockly.Blocks['variables_set'] = {
     return [this.getFieldValue('VAR')];
   },
   /**
+   * Modify this block to have the correct input and output types.
+   * @param {string} newMode Either 'SPLIT' or 'JOIN'.
+   * @private
+   * @this Blockly.Block
+   */
+  updateType_: function(type) {
+	var types = {INT: "Number", STR: "String"};
+    this.getInput('VALUE').setCheck(types[type]);
+  },
+  /**
    * Runs everytime the workspace changes.
    * Show a warning if variable is not defined
    */
   onchange: function() {
-	if (goog.array.contains(Blockly.Variables.allVariables(workspace,true), this.getFieldValue('VAR'))) {
+	var allVars = Blockly.Variables.allVariables(workspace,true,false);
+	if (goog.array.contains(allVars, this.getFieldValue('VAR'))) {
       this.setWarningText(null);
+	  this.updateType_(Blockly.Variables.allVariables(workspace,true,true)[this.getFieldValue('VAR')]);
 	} else {
       this.setWarningText("The definition for this variable is missing!");
 	}
@@ -170,8 +207,22 @@ Blockly.Blocks['variables_def'] = {
    * @return {!Array.<string>} List of variable names.
    * @this Blockly.Block
    */
-  getVars: function() {
-    return [this.getFieldValue('VAR')];
+  getVars: function(type) {
+	if (type) {
+		return [this.getFieldValue('VAR'),this.getFieldValue('TYPE')];
+	} else {
+		return [this.getFieldValue('VAR')];
+	}
+  },
+  /**
+   * Modify this block to have the correct input and output types.
+   * @param {string} newMode Either 'SPLIT' or 'JOIN'.
+   * @private
+   * @this Blockly.Block
+   */
+  onchange: function(type) {
+	var types = {INT: "Number", STR: "String"};
+    this.getInput('INITIAL').setCheck(types[this.getFieldValue('TYPE')]);
   },
   /**
    * Notification that a variable is renaming.

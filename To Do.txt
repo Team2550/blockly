@@ -1,5 +1,7 @@
 To Do List:
--	Change type requirements for setting and getting of variables
+-	Change type requirements for setting and getting of variables                               -DONE- 2/1/2016
+-   Force initial values of variables to exclude other variable values
+-   Add more basic variable types
 -	Fix how code is generated for variables so they are declared first
 -	Add variable types for motors and sensors
 -	Add ways to separate code into multiple workspaces

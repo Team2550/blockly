@@ -42,7 +42,7 @@ Blockly.Variables.NAME_TYPE = 'VARIABLE';
  * @param {!Blockly.Block|!Blockly.Workspace} root Root block or workspace.
  * @return {!Array.<string>} Array of variable names.
  */
-Blockly.Variables.allVariables = function(root, defined) {
+Blockly.Variables.allVariables = function(root, defined, type) {
   var blocks;
   if (root.getDescendants) {
     // Root is Block.
@@ -59,14 +59,19 @@ Blockly.Variables.allVariables = function(root, defined) {
     if (!(blocks[x].outputConnection || blocks[x].previousConnection)) {
 	  var descendants = blocks[x].getDescendants();
 	  for (var y = 0; y < descendants.length; y++) {
-		  if (descendants[y].type && (descendants[y].type == "variables_def" || !defined)) {
+		  if (descendants[y].type && (descendants[y].type == "variables_def" || !(defined || type))) {
 			  if (descendants[y].getVars) {
-				  var blockVariables = descendants[y].getVars();
-				  for (var z = 0; z < blockVariables.length; z++) {
-					var varName = blockVariables[z];
-					// Variable name may be null if the block is only half-built.
-					if (varName) {
-					  variableHash[varName.toLowerCase()] = varName;
+				  if (type) {
+					var blockVariable = descendants[y].getVars(true);
+					variableHash[blockVariable[0].toLowerCase()] = blockVariable[1];
+				  } else {
+					var blockVariables = descendants[y].getVars();
+					for (var z = 0; z < blockVariables.length; z++) {
+						var varName = blockVariables[z];
+						// Variable name may be null if the block is only half-built.
+						if (varName) {
+						  variableHash[varName.toLowerCase()] = varName;
+						}
 					}
 				  }
 			  }
@@ -75,12 +80,16 @@ Blockly.Variables.allVariables = function(root, defined) {
     }
   }
   // Flatten the hash into a list.
-  var variableList = [];
-  for (var name in variableHash) {
-    variableList.push(variableHash[name]);
+  if (type) {
+	  return variableHash;
+  } else {
+	  var variableList = [];
+	  for (var name in variableHash) {
+		variableList.push(variableHash[name]);
+	  }
+	  
+	  return variableList;
   }
-  
-  return variableList;
 };
 
 /**

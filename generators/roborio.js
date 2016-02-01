@@ -121,7 +121,7 @@ Blockly.RoboRio.init = function(workspace) {
   }
   
   var defvars = [];
-  var variables = Blockly.Variables.allVariables(workspace);
+  var variables = Blockly.Variables.allVariables(workspace, false, false);
   for (var i = 0; i < variables.length; i++) {
     defvars[i] = 'string ' +
         Blockly.RoboRio.variableDB_.getName(variables[i],
